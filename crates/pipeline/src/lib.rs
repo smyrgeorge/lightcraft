@@ -7,7 +7,7 @@
 //! Stage order (see `docs/pipeline.md`):
 //! 1. geometry — user orientation, lens corrections (distortion, CA, vignetting), perspective, crop +
 //!    straighten, flips; one resample at output resolution; then defringe
-//! 2. scene-linear — white balance, exposure, dehaze, local tone (highlights/shadows), texture,
+//! 2. scene-linear — Convert Negative (a film scan to a positive, [`negative`]), white balance, exposure, dehaze, local tone (highlights/shadows), texture,
 //!    clarity, local adjustments (masks)
 //! 3. tone map — contrast / whites / blacks filmic curve on luminance, highlight desaturation
 //! 4. colour — vibrance, saturation, colour mixer, colour grading, B&W (OkLCh)
@@ -34,6 +34,7 @@ pub mod local;
 pub mod local_tone;
 pub mod lut;
 pub mod masks;
+pub mod negative;
 pub mod optics;
 pub mod output;
 pub mod profiles;
@@ -448,6 +449,8 @@ pub fn plan<'a>(src: &Rgb32f, info: &SourceInfo, s: &'a DevelopSettings, req: &R
         format!("{:?}", s.optics),
         // and the local tone mapping
         local_tone::enabled(info, s),
+        // and Convert Negative
+        negative::enabled(s).then(|| format!("{:?}", s.negative)),
         src_long,
     ));
     let lin_key = hash_of((
@@ -458,11 +461,11 @@ pub fn plan<'a>(src: &Rgb32f, info: &SourceInfo, s: &'a DevelopSettings, req: &R
     Plan { settings, frame, w, h, px_per_long, src_long, detail_scale, geo, lin_key, pre_nr_key, eyes, fixed_air, keep, mattes: info.mattes.clone() }
 }
 
-/// Whether the scene-linear stage needs work only the CPU does (defringe, spot removal).
+/// Whether the scene-linear stage needs work only the CPU does (defringe, spot removal, Convert Negative).
 pub fn lin_needs_cpu(s: &DevelopSettings, info: &SourceInfo) -> bool {
     let o = &s.optics;
     let defringe = s.section_enabled("optics") && (o.defringe_purple_amount > 0.0 || o.defringe_green_amount > 0.0);
-    defringe || !s.spots.is_empty() || local_tone::enabled(info, s)
+    defringe || !s.spots.is_empty() || local_tone::enabled(info, s) || negative::enabled(s)
 }
 
 /// The white-balanced, defringed, retouched image (before noise reduction): the CPU part of the
@@ -471,6 +474,8 @@ pub fn lin_cpu(img: &mut Rgb32f, info: &SourceInfo, p: &Plan<'_>) {
     let s = &*p.settings;
     // (before the white balance: the gain's input is the as-shot development, as in the file)
     local_tone::apply(img, info, p);
+    // (and the negative becomes a positive before anything edits it)
+    negative::apply(img, s);
     local::white_balance(img, info, s);
     optics::defringe(img, s, p.px_per_long / optics::DEFRINGE_REF_LONG);
     spots::apply(img, &s.spots, &p.frame, p.px_per_long);
