@@ -215,8 +215,7 @@ mod tests {
     fn hostile_settings_never_poison_the_image() {
         let mut img = scan(30, 20);
         img.data[3] = [f32::NAN, f32::INFINITY, -5.0];
-        let mut s = DevelopSettings::default();
-        s.negative = Negative {
+        let negative = Negative {
             enabled: true,
             advanced: true,
             preset: "no such film".into(),
@@ -228,7 +227,7 @@ mod tests {
             measured: Some(NegativeMeasurement { base: [0.0; 3], black: [f64::NAN; 3], white: [1.0; 3], balance: [f64::INFINITY; 3] }),
             ..Negative::default()
         };
-        apply(&mut img, &s);
+        apply(&mut img, &DevelopSettings { negative, ..DevelopSettings::default() });
         assert!(img.data.iter().flatten().all(|v| v.is_finite()), "{:?}", &img.data[..6]);
         assert!(measure(&Rgb32f::new(0, 0), 0.08).is_err());
     }

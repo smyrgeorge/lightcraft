@@ -1,6 +1,6 @@
 # Lightroom parity checklist
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-15 · **Change:** minor (LRC-PRINT-PAGE: Print Page Options) · **Target:** Adobe Lightroom Classic 15.5 / Lightroom 9.6
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-19 · **Change:** minor (MENU-PHOTO-NEGATIVE: Convert Negative) · **Target:** Adobe Lightroom Classic 15.5 / Lightroom 9.6
 
 The measured, row-by-row checklist: one row per Lightroom feature, menu item and shortcut, what we
 have and what is missing. It answers *does the feature exist?* (feature breadth). Whether it is good
@@ -50,12 +50,12 @@ cited here still exists. Formerly docs/parity.md.
 | V. Preferences (PREF) | 6 | 2 | 2 | 2 | 1/1 (100%) | 4/5 (80%) |
 | W. Cloud & AI infrastructure (CLOUD / AI) | 1 | 0 | 1 | 2 | — | — |
 | X. Cross-cutting behaviours (BEHAV) | 23 | 6 | 1 | 1 | 8/8 (100%) | 7/10 (70%) |
-| Y. Menus | 84 | 0 | 4 | 8 | 47/47 (100%) | 23/23 (100%) |
+| Y. Menus | 85 | 0 | 4 | 8 | 47/47 (100%) | 23/23 (100%) |
 | Z. Keyboard shortcuts (desktop) | 78 | 4 | 2 | 1 | 49/52 (94%) | 24/26 (92%) |
 | Lightroom Classic extras | 40 | 23 | 23 | 8 | — | 24/26 (92%) |
-| **Total** | 419 | 61 | 59 | 35 | 194/201 (97%) | 148/161 (92%) |
+| **Total** | 420 | 61 | 59 | 35 | 194/201 (97%) | 148/161 (92%) |
 
-Weighted completion (✅ = 1, 🟡 = ½, 🚫 left out): **83.4%** of 539 in-scope rows — P0 98.3% of 201 · P1 95.0% of 161 · P2 55.7% of 176.
+Weighted completion (✅ = 1, 🟡 = ½, 🚫 left out): **83.4%** of 540 in-scope rows — P0 98.3% of 201 · P1 95.0% of 161 · P2 55.9% of 177.
 <!-- /parity:summary -->
 
 ## Top gaps and shortcut notes
@@ -565,6 +565,7 @@ visible menu bar yet: the menu model is only exposed through the control channel
 | MENU-PHOTO-ENHANCE | Enhance… | P2 | ⬜ | | |
 | MENU-PHOTO-AUTO | Auto settings | P0 | ✅ | `cmd:develop.auto` | |
 | MENU-PHOTO-BW | Convert to B&W | P0 | ✅ | `cmd:develop.treatment` | |
+| MENU-PHOTO-NEGATIVE | Convert Negative | P2 | ✅ | `cmd:photo.convertNegative`, `cmd:panel.negative`, `cmd:develop.negative`, `cmd:develop.negativePick`, `cmd:tool.negBase`, `cmd:tool.negGray`, `ctl:negative.*`, `crates/film/src/lib.rs`, `crates/pipeline/src/negative.rs`, `docs/convert-negative.md` | beyond Lightroom: a scanned film negative as a positive, non-destructively; the scan measured once inside the crop; Simple (film preset + six sliders) and Advanced (film base and gray point picked from the photo, tone, colour, white balance, tone sliders) panel; copy / sync carries it across a roll |
 | MENU-PHOTO-RESET | Reset edits / crop | P0 | ✅ | `cmd:develop.reset`, `cmd:crop.reset` | |
 | MENU-PHOTO-UPDATEAI | Update AI settings | P2 | ⬜ | | |
 | MENU-PHOTO-RENAME | Rename N photos… | P1 | ✅ | `cmd:dialog.rename` | live “Rename N Photos…” label |
@@ -797,6 +798,7 @@ Latin stays upright. Advanced Japanese composition remains open. Regression cove
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-19 | minor | MENU-PHOTO-NEGATIVE (new row, ✅): Photo ▸ Convert Negative, the film-negative conversion with its Simple / Advanced panel and the film base / gray point selectors |
 | 2026-10-14 | patch | LR-EXP-TYPE: opaque 8-bit PNG/TIFF/WebP use RGB; transparent exports retain alpha (#1670). Statuses and feature counts unchanged. |
 | 2026-10-15 | minor | LRC-PRINT-PAGE: Page Options (Page Numbers, Page Info, Crop Marks) on Single Image and Contact Sheet pages, in the Print dialog, `print.set` and templates; still 🟡 (no identity plate, watermark, photo info or Cut Guides) |
 | 2026-10-15 | minor | LR-IMP-FORMATS: Hasselblad 3FR and FFF show their uncompressed RGB preview (no JPEG in these files) in the grid and loupe until developed, and as the stand-in when a file fails to decode; status unchanged (🟡) |
