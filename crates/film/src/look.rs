@@ -60,6 +60,10 @@ impl Look {
         Self::ALL.iter().find(|(_, name)| *name == s).map(|(t, _)| *t)
     }
 
+    pub fn name(self) -> &'static str {
+        Self::ALL.iter().find(|(t, _)| *t == self).map_or("neutral", |(_, name)| name)
+    }
+
     /// A row-major matrix on linear RGB (rows sum to 1, so neutrals stay neutral), plus
     /// temperature / tint offsets, a saturation factor and a shadow tint (linear RGB gains
     /// weighted towards black).

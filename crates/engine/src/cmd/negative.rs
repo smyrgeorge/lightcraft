@@ -32,9 +32,18 @@ fn choice(p: &Value, key: &str, c: &str, known: impl Fn(&str) -> bool) -> Result
     }
 }
 
+/// Measures photo `id` inside its crop (the crop's box, straightening left aside), `border` in
+/// from each edge.
 fn measure(s: &mut Session, id: crate::PhotoId, border: f64, c: &str) -> Result<lightcraft_develop::NegativeMeasurement> {
     let src = s.source_now(id, SourceLevel::Preview).map_err(|e| bad(c, e))?;
-    lightcraft_pipeline::negative::measure(&src, border).map_err(|e| bad(c, e))
+    let d = s.develop_of(id).unwrap_or_default();
+    let o = src.oriented(d.orientation);
+    let r = d.crop.geometry.rect;
+    let (w, h) = (o.width as f64, o.height as f64);
+    let at = |v: f64, n: f64| if v.is_finite() { (v.clamp(0.0, 1.0) * n).round() as usize } else { 0 };
+    let (x0, y0, x1, y1) = (at(r.x0, w), at(r.y0, h), at(r.x1, w), at(r.y1, h));
+    let framed = if x1 > x0 && y1 > y0 { o.crop(x0, y0, x1 - x0, y1 - y0) } else { o };
+    lightcraft_pipeline::negative::measure(&framed, border).map_err(|e| bad(c, e))
 }
 
 pub fn specs() -> Vec<CommandSpec> {
