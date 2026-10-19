@@ -3288,6 +3288,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "lightcraft-film"
+version = "0.9.1"
+dependencies = [
+ "libm",
+]
+
+[[package]]
 name = "lightcraft-geocode"
 version = "0.9.1"
 dependencies = [
