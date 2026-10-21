@@ -1,6 +1,6 @@
 # Lightroom parity checklist
 
-> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-21 · **Change:** minor (LR-MERGE-HDR / LR-MERGE-PANO: Lanczos-3 warps; LR-IMP-LOCAL: browsing from the sidebar records the folder; LR-VIEW-ZOOM: only a full-size drag within 20 ms clears a slow-drag verdict; LR-IMP-ADD-DIALOG: hierarchical import album destination reconciled with main, #2362; KEY-SLIDER-NUDGE: vertical wheel nudges need a click or drag in the row; leaving it disarms them; LR-EDIT-OPTICS-PROFILE: Fujifilm nine-knot lens tables read at the plain radius; LR-VIEW-ZOOM: only a full-size drag within 20 ms clears a slow-drag verdict; LRC-LIB-LIBFOLDERS, LR-BEHAV-BG-TASKS: Synchronize Folder's scan shows its folder listing and stops it on ✕; LRC-LIB-LIBFOLDERS: Synchronize Folder says a folder is up to date; LR-LIB-STACK: filmstrip stack badge click; LRC-LIB-REFVIEW / CATALOG-SWITCH: Escape preserves edits; catalog-local pins; deleted and malformed references refused; LRC-LIB-COMPARE: the Info panel labels the active photo while culling, #2398; KEYC-RATING: `\` shows / hides the Filter Bar in the grids; LR-VIEW-PHOTOGRID: the grid reads only the photos an import batch or an edit touched, not the whole list; earlier: LRC-PRINT-PAGE: Print Page Options; LR-META-XMP: fewer false unimported-XMP warnings) · **Target:** Adobe Lightroom Classic 15.5 / Lightroom 9.6
+> **Last reviewed:** 2026-10-10 · **Last updated:** 2026-10-22 · **Change:** minor (MENU-PHOTO-NEGATIVE: Convert Negative) · **Target:** Adobe Lightroom Classic 15.5 / Lightroom 9.6
 
 The measured, row-by-row checklist: one row per Lightroom feature, menu item and shortcut, what we
 have and what is missing. It answers *does the feature exist?* (feature breadth). Whether it is good
@@ -50,12 +50,12 @@ cited here still exists. Formerly docs/parity.md.
 | V. Preferences (PREF) | 6 | 2 | 2 | 2 | 1/1 (100%) | 4/5 (80%) |
 | W. Cloud & AI infrastructure (CLOUD / AI) | 1 | 0 | 1 | 2 | — | — |
 | X. Cross-cutting behaviours (BEHAV) | 23 | 6 | 1 | 1 | 8/8 (100%) | 7/10 (70%) |
-| Y. Menus | 85 | 0 | 4 | 8 | 47/47 (100%) | 23/23 (100%) |
+| Y. Menus | 86 | 0 | 4 | 8 | 47/47 (100%) | 23/23 (100%) |
 | Z. Keyboard shortcuts (desktop) | 78 | 4 | 2 | 1 | 49/52 (94%) | 24/26 (92%) |
 | Lightroom Classic extras | 40 | 25 | 21 | 8 | — | 24/26 (92%) |
-| **Total** | 422 | 63 | 57 | 35 | 196/203 (97%) | 148/161 (92%) |
+| **Total** | 423 | 63 | 57 | 35 | 196/203 (97%) | 148/161 (92%) |
 
-Weighted completion (✅ = 1, 🟡 = ½, 🚫 left out): **83.7%** of 542 in-scope rows — P0 98.3% of 203 · P1 95.0% of 161 · P2 56.5% of 177.
+Weighted completion (✅ = 1, 🟡 = ½, 🚫 left out): **83.7%** of 543 in-scope rows — P0 98.3% of 203 · P1 95.0% of 161 · P2 56.7% of 178.
 <!-- /parity:summary -->
 
 ## Top gaps and shortcut notes
@@ -566,6 +566,7 @@ visible menu bar yet: the menu model is only exposed through the control channel
 | MENU-PHOTO-ENHANCE | Enhance… | P2 | ⬜ | | |
 | MENU-PHOTO-AUTO | Auto settings | P0 | ✅ | `cmd:develop.auto` | |
 | MENU-PHOTO-BW | Convert to B&W | P0 | ✅ | `cmd:develop.treatment` | |
+| MENU-PHOTO-NEGATIVE | Convert Negative | P2 | ✅ | `cmd:photo.convertNegative`, `cmd:panel.negative`, `cmd:develop.negative`, `cmd:develop.negativePick`, `cmd:tool.negBase`, `cmd:tool.negGray`, `ctl:negative.*`, `crates/film/src/lib.rs`, `crates/pipeline/src/negative.rs`, `docs/convert-negative.md` | beyond Lightroom: a scanned film negative as a positive, non-destructively; the scan measured once inside the crop; Simple (film preset + six sliders) and Advanced (film base and gray point picked from the photo, tone, colour, white balance, tone sliders) panel; copy / sync carries it across a roll |
 | MENU-PHOTO-RESET | Reset edits / crop | P0 | ✅ | `cmd:develop.reset`, `cmd:crop.reset` | |
 | MENU-PHOTO-UPDATEAI | Update AI settings | P2 | ⬜ | | |
 | MENU-PHOTO-RENAME | Rename N photos… | P1 | ✅ | `cmd:dialog.rename` | live “Rename N Photos…” label |
@@ -798,6 +799,7 @@ Latin stays upright. Advanced Japanese composition remains open. Regression cove
 
 | Date | Change | Summary |
 |---|---|---|
+| 2026-10-22 | minor | MENU-PHOTO-NEGATIVE (new row, ✅): Photo ▸ Convert Negative, the film-negative conversion with its Simple / Advanced panel and the film base / gray point selectors |
 | 2026-10-21 | patch | LR-IMP-ADD-DIALOG: reconcile #2362 with current main; deleted-album guard and hierarchical picker retained; counts unchanged |
 | 2026-10-20 | minor | LR-IMP-ADD-DIALOG: #2362 gives the import review the shared hierarchy/search album picker while retaining None/New album and existing destination IDs; status and feature counts unchanged |
 | 2026-10-21 | patch | KEY-SLIDER-NUDGE: vertical wheel nudges need a click or drag in the slider's row; leaving it (even between two frames) or Tab focus alone does not arm them (issue #1355); status unchanged |

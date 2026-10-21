@@ -4704,6 +4704,8 @@ mod tests {
             ("wbPicker", egui::CursorIcon::Crosshair),
             ("colorRange", egui::CursorIcon::Crosshair),
             ("pointColor", egui::CursorIcon::Crosshair),
+            ("negBase", egui::CursorIcon::Crosshair),
+            ("negGray", egui::CursorIcon::Crosshair),
             ("tat:curve", egui::CursorIcon::ResizeVertical),
         ] {
             h.app.ui.tool = tool.into();

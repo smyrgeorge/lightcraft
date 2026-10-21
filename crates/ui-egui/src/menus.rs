@@ -152,6 +152,7 @@ pub const UI_COMMANDS: &[UiCommand] = &[
     ("panel.remove", "Remove", Some("H"), "Window"),
     ("panel.masking", "Masking", Some("M"), "Window"),
     ("panel.redeye", "Red Eye", None, "Window"),
+    ("panel.negative", "Convert Negative", None, ""),
     ("panel.presets", "Presets", Some("Shift+P"), "Window"),
     ("panel.info", "Info", Some("I"), "Window"),
     ("panel.keywords", "Keywords", Some("K"), "Window"),
@@ -171,6 +172,8 @@ pub const UI_COMMANDS: &[UiCommand] = &[
     ("tool.linear", "Linear Gradient", Some("L"), "Window>Tools"),
     ("tool.radial", "Radial Gradient", Some("R"), "Window>Tools"),
     ("tool.wbPicker", "White Balance Selector", Some("W"), "Window>Tools"),
+    ("tool.negBase", "Film Base Selector", None, ""),
+    ("tool.negGray", "Gray Point Selector", None, ""),
     ("tool.none", "No Tool", None, ""),
     // brush size / feather of the active brush (Masking brush, Remove tool and its selected spot)
     ("brush.smaller", "Decrease Brush Size", Some("["), "Window>Tools"),
@@ -274,6 +277,8 @@ pub const UI_COMMANDS: &[UiCommand] = &[
     ("dialog.rename", "Rename Photos…", Some("F2"), "Photo"),
     ("dialog.labelNames", "Edit Color Label Names…", None, ""),
     ("dialog.captureTime", "Edit Capture Time…", None, "Photo"),
+    // the active photo is a film negative: switch the conversion on and open its panel
+    ("photo.convertNegative", "Convert Negative", None, "Photo"),
     ("photo.tagFromTracklog", "Auto-Tag from Tracklog…", None, "Photo"),
     ("app.exportPrevious", "Export with Previous", Some("Cmd+Alt+Shift+E"), "File"),
 ];
@@ -1220,6 +1225,23 @@ pub fn run_ui_command(app: &mut LightcraftApp, id: &str, p: &Value) -> Option<Re
             panel(app, &ctx, RightPanel::RedEye, "Red Eye");
             Ok(Value::Null)
         }
+        "panel.negative" => {
+            panel(app, &ctx, RightPanel::Negative, "Convert Negative");
+            Ok(Value::Null)
+        }
+        "photo.convertNegative" => {
+            let Some(id) = app.session.active() else { return Some(Err("no photo selected".into())) };
+            let on = app.session.develop_of(id).is_some_and(|d| d.negative.enabled);
+            if !on && let Err(e) = app.run("develop.negative", json!({})) {
+                return Some(Err(e));
+            }
+            app.ui.right = RightPanel::Negative;
+            app.ui.view = ViewMode::Detail;
+            if !app.ui.tool.starts_with("neg") {
+                app.ui.tool.clear();
+            }
+            Ok(json!({"converted": true}))
+        }
         "panel.info" => {
             panel(app, &ctx, RightPanel::Info, "Info");
             Ok(Value::Null)
@@ -1321,6 +1343,11 @@ pub fn run_ui_command(app: &mut LightcraftApp, id: &str, p: &Value) -> Option<Re
                     app.ui.right = RightPanel::Edit;
                     app.ui.view = ViewMode::Detail;
                     app.ui.tool = "wbPicker".into();
+                }
+                "negBase" | "negGray" => {
+                    app.ui.right = RightPanel::Negative;
+                    app.ui.view = ViewMode::Detail;
+                    app.ui.tool = tool.into();
                 }
                 other => return Some(Err(format!("unknown tool `{other}`"))),
             }
